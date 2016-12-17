@@ -1,4 +1,7 @@
 import sys, os
+
+from pymongo.errors import PyMongoError
+
 try:
     from Queue import Queue, Empty
 except ImportError:
@@ -284,6 +287,12 @@ class MongoDBPubSub:
         except:
             print("Failed to connect to Mongo database. Exiting.")
             sys.exit(0)
+        try:
+            indexes = self.collection.index_information()
+            if len(indexes.keys()) == 1:
+                self.collection.create_index([("timestamp", pymongo.ASCENDING), ("topic", pymongo.ASCENDING)])
+        except PyMongoError:
+            print("Failed to create an index.")
 
     def publish(self, topic, message):
         self.collection.insert({'topic': topic, 'message': message, 'timestamp': datetime.utcnow()})
