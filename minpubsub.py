@@ -1,8 +1,8 @@
 import sys, os
 try:
-    from Queue import Queue
+    from Queue import Queue, Empty
 except ImportError:
-    from queue import Queue
+    from queue import Queue, Empty
 import tempfile
 from datetime import datetime
 
@@ -31,7 +31,7 @@ class MemorySubscriber:
                 if numOfItemsRetrieved == maxItemsToRetreive:
                     break
                 items.append(self.messages.get_nowait())
-            except Empty, e:
+            except Empty:
                 break
         return items
 
@@ -114,7 +114,7 @@ class SQLiteSubscriber:
                 if numOfItemsRetrieved == maxItemsToRetreive:
                     break
                 items.append(self.messages.get_nowait())
-            except Empty, e:
+            except Empty:
                 break
         return items
 
@@ -134,7 +134,7 @@ class SQLitePubSub:
         try:
             import sqlite3
         except ImportError:
-            print "sqlite3 package could not be imported. Exiting."
+            print("sqlite3 package could not be imported. Exiting.")
             sys.exit(0)
         if not os.path.isdir(directory):
             raise ValueError('the given Path "', directory, '" is not a valid directory.')
@@ -192,7 +192,7 @@ class MySQLSubscriber:
                 if numOfItemsRetrieved == maxItemsToRetreive:
                     break
                 items.append(self.messages.get_nowait())
-            except Empty, e:
+            except Empty:
                 break
         return items
 
@@ -207,7 +207,7 @@ class MySQLPubSub:
         try:
             import MySQLdb
         except ImportError:
-            print "MySQLdb package could not be imported. Exiting."
+            print("MySQLdb package could not be imported. Exiting.")
             sys.exit(0)
         try:
             self.connection = MySQLdb.connect(argv[0], argv[1], argv[2], argv[3])
@@ -220,7 +220,7 @@ class MySQLPubSub:
             if "mps_messages" not in available_tables:
                 self.cursor.execute("CREATE TABLE IF NOT EXISTS mps_messages(topic VARCHAR(100), message VARCHAR(1000), timestamp VARCHAR(100))")
         except:
-            print "Error connecting to MySQL database"
+            print("Error connecting to MySQL database")
             sys.exit(0)
 
     def publish(self, topic, message):
@@ -260,7 +260,7 @@ class MongoDBSubscriber:
                 if numOfItemsRetrieved == maxItemsToRetreive:
                     break
                 items.append(self.messages.get_nowait())
-            except Empty, e:
+            except Empty:
                 break
         return items
 
@@ -275,14 +275,14 @@ class MongoDBPubSub:
         try:
             import pymongo
         except ImportError:
-            print "Pymongo package could not be imported. Exiting."
+            print("Pymongo package could not be imported. Exiting.")
             sys.exit(0)
         try:
             self.connection = pymongo.Connection(argv[0], int(argv[1]))
             self.db = self.connection.minpubsub
             self.collection = self.db['mps_messages']
         except:
-            print "Failed to connect to Mongo database. Exiting."
+            print("Failed to connect to Mongo database. Exiting.")
             sys.exit(0)
 
     def publish(self, topic, message):
@@ -307,5 +307,5 @@ def create(name, *argv):
         handler = MongoDBPubSub(*argv)
         return handler
     else:
-        print "Option not found! Exiting."
+        print("Option not found! Exiting.")
         sys.exit(0)
