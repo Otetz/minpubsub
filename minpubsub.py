@@ -278,7 +278,7 @@ class MongoDBPubSub:
             print("Pymongo package could not be imported. Exiting.")
             sys.exit(0)
         try:
-            self.connection = pymongo.Connection(argv[0], int(argv[1]))
+            self.connection = pymongo.MongoClient(argv[0], int(argv[1]))
             self.db = self.connection.minpubsub
             self.collection = self.db['mps_messages']
         except:
