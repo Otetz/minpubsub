@@ -242,7 +242,7 @@ class MongoDBSubscriber:
         self.cursor = self.collection.find({'topic': {'$in': self.topics}, 'timestamp': {'$gte': self.timestamp}})
         for data in self.cursor:
             self.messages.put_nowait(data['message'])
-        self.timestamp = datetime.now()
+        self.timestamp = datetime.utcnow()
         if self.messages.qsize() == 0:
             return None
         else:
@@ -252,7 +252,7 @@ class MongoDBSubscriber:
         self.cursor = self.collection.find({'topic': {'$in': self.topics}, 'timestamp': {'$gte': self.timestamp}})
         for data in self.cursor:
             self.messages.put_nowait(data['message'])
-        self.timestamp = datetime.now()
+        self.timestamp = datetime.utcnow()
         items = []
         maxItemsToRetreive = self.messages.qsize()
         for numOfItemsRetrieved in range(0, maxItemsToRetreive):
@@ -286,10 +286,10 @@ class MongoDBPubSub:
             sys.exit(0)
 
     def publish(self, topic, message):
-        self.collection.insert({'topic': topic, 'message': message, 'timestamp': datetime.now()})
+        self.collection.insert({'topic': topic, 'message': message, 'timestamp': datetime.utcnow()})
 
     def subscribe(self, *topics):
-        timestamp = datetime.now()
+        timestamp = datetime.utcnow()
         subscriber = MongoDBSubscriber(self.collection, topics, timestamp)
         return subscriber
 
